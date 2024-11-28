@@ -52,60 +52,60 @@ namespace AnimalClinicAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Appointments",
-                columns: table => new
-                {
-                    Appointment_ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Pet_ID = table.Column<int>(type: "int", nullable: false),
-                    Customer_ID = table.Column<int>(type: "int", nullable: false),
-                    StatusAppointment = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    AppointmentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AppointmentTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    Pet_ID1 = table.Column<int>(type: "int", nullable: false),
-                    PetOwnerCustomer_ID = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Appointments", x => x.Appointment_ID);
-                    table.ForeignKey(
-                        name: "FK_Appointments_PetOwners_PetOwnerCustomer_ID",
-                        column: x => x.PetOwnerCustomer_ID,
-                        principalTable: "PetOwners",
-                        principalColumn: "Customer_ID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Appointments_Pets_Pet_ID1",
-                        column: x => x.Pet_ID1,
-                        principalTable: "Pets",
-                        principalColumn: "Pet_ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
+    name: "Appointments",
+    columns: table => new
+    {
+        Appointment_ID = table.Column<int>(type: "int", nullable: false)
+            .Annotation("SqlServer:Identity", "1, 1"),
+        Pet_ID = table.Column<int>(type: "int", nullable: false),
+        Customer_ID = table.Column<int>(type: "int", nullable: false),
+        StatusAppointment = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+        AppointmentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+        AppointmentTime = table.Column<TimeSpan>(type: "time", nullable: false),
+        Pet_ID1 = table.Column<int>(type: "int", nullable: false),
+        PetOwnerCustomer_ID = table.Column<int>(type: "int", nullable: false)
+    },
+    constraints: table =>
+    {
+        table.PrimaryKey("PK_Appointments", x => x.Appointment_ID);
+        table.ForeignKey(
+            name: "FK_Appointments_PetOwners_PetOwnerCustomer_ID",
+            column: x => x.PetOwnerCustomer_ID,
+            principalTable: "PetOwners",
+            principalColumn: "Customer_ID",
+            onDelete: ReferentialAction.Cascade); // สามารถตั้งเป็น NoAction หรือ SetNull ได้
+        table.ForeignKey(
+            name: "FK_Appointments_Pets_Pet_ID1",
+            column: x => x.Pet_ID1,
+            principalTable: "Pets",
+            principalColumn: "Pet_ID",
+            onDelete: ReferentialAction.NoAction); // เปลี่ยนจาก Cascade เป็น NoAction
+    });
 
-            migrationBuilder.CreateTable(
-                name: "MedicalRecords",
-                columns: table => new
-                {
-                    Record_ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Pet_ID = table.Column<int>(type: "int", nullable: false),
-                    TreatmentType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    TreatmentDetail = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Pet_Weight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Medical_Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Medicineget = table.Column<bool>(type: "bit", nullable: false),
-                    Pet_ID1 = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MedicalRecords", x => x.Record_ID);
-                    table.ForeignKey(
-                        name: "FK_MedicalRecords_Pets_Pet_ID1",
-                        column: x => x.Pet_ID1,
-                        principalTable: "Pets",
-                        principalColumn: "Pet_ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
+    migrationBuilder.CreateTable(
+        name: "MedicalRecords",
+        columns: table => new
+        {
+            Record_ID = table.Column<int>(type: "int", nullable: false)
+                .Annotation("SqlServer:Identity", "1, 1"),
+            Pet_ID = table.Column<int>(type: "int", nullable: false),
+            TreatmentType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+            TreatmentDetail = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+            Pet_Weight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+            Medical_Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+            Medicineget = table.Column<bool>(type: "bit", nullable: false),
+            Pet_ID1 = table.Column<int>(type: "int", nullable: false)
+        },
+        constraints: table =>
+        {
+            table.PrimaryKey("PK_MedicalRecords", x => x.Record_ID);
+            table.ForeignKey(
+                name: "FK_MedicalRecords_Pets_Pet_ID1",
+                column: x => x.Pet_ID1,
+                principalTable: "Pets",
+                principalColumn: "Pet_ID",
+                onDelete: ReferentialAction.NoAction); // เปลี่ยนจาก Cascade เป็น NoAction
+        });
 
             migrationBuilder.CreateTable(
                 name: "Medicines",

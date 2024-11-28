@@ -26,14 +26,14 @@ namespace AnimalClinicAPI.Models
             modelBuilder.Entity<Appointment>()
                 .HasOne(a => a.Pet)  // Pet -> Appointment
                 .WithMany(p => p.Appointments) // Pet สามารถมีหลาย Appointment
-                .HasForeignKey(a => a.Pet_ID);  // กำหนดว่า Pet_ID เป็น Foreign Key ใน Appointment
-                
+                .HasForeignKey(a => a.Pet_ID)  // กำหนดว่า Pet_ID เป็น Foreign Key ใน Appointment
+                 .OnDelete(DeleteBehavior.Restrict);
             // กำหนดความสัมพันธ์ของ Appointment กับ Customer (PetOwner)
              modelBuilder.Entity<Appointment>()
                 .HasOne(a => a.PetOwner)  // Customer -> Appointment
                 .WithMany(c => c.Appointments) // Customer สามารถมีหลาย Appointment
-                .HasForeignKey(a => a.Customer_ID);  // กำหนดว่า Customer_ID เป็น Foreign Key ใน Appointment
-
+                .HasForeignKey(a => a.Customer_ID)  // กำหนดว่า Customer_ID เป็น Foreign Key ใน Appointment
+                .OnDelete(DeleteBehavior.Restrict); 
             // กำหนดความสัมพันธ์ของ MedicalRecord กับ Pet
             modelBuilder.Entity<MedicalRecord>()
                 .HasOne(m => m.Pet)  // Pet -> MedicalRecord
