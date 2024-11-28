@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AnimalClinicAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241128190403_AddMedicalRecordsToPet")]
-    partial class AddMedicalRecordsToPet
+    [Migration("20241128203700_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,9 +42,6 @@ namespace AnimalClinicAPI.Migrations
                     b.Property<int>("Customer_ID")
                         .HasColumnType("int");
 
-                    b.Property<int>("PetOwnerCustomer_ID")
-                        .HasColumnType("int");
-
                     b.Property<int>("Pet_ID")
                         .HasColumnType("int");
 
@@ -55,7 +52,7 @@ namespace AnimalClinicAPI.Migrations
 
                     b.HasKey("Appointment_ID");
 
-                    b.HasIndex("PetOwnerCustomer_ID");
+                    b.HasIndex("Customer_ID");
 
                     b.HasIndex("Pet_ID");
 
@@ -174,15 +171,15 @@ namespace AnimalClinicAPI.Migrations
             modelBuilder.Entity("AnimalClinicAPI.Models.Appointment", b =>
                 {
                     b.HasOne("AnimalClinicAPI.Models.PetOwner", "PetOwner")
-                        .WithMany()
-                        .HasForeignKey("PetOwnerCustomer_ID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithMany("Appointments")
+                        .HasForeignKey("Customer_ID")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("AnimalClinicAPI.Models.Pet", "Pet")
                         .WithMany("Appointments")
                         .HasForeignKey("Pet_ID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Pet");
@@ -217,6 +214,11 @@ namespace AnimalClinicAPI.Migrations
                     b.Navigation("Appointments");
 
                     b.Navigation("MedicalRecords");
+                });
+
+            modelBuilder.Entity("AnimalClinicAPI.Models.PetOwner", b =>
+                {
+                    b.Navigation("Appointments");
                 });
 #pragma warning restore 612, 618
         }
