@@ -96,6 +96,52 @@ namespace AnimalClinicAPI.Controllers
         private bool MedicalRecordExists(int id)
         {
             return _context.MedicalRecords.Any(e => e.Record_ID == id);
+        }// GET: api/MedicalRecord/search
+        
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<MedicalRecord>>> SearchMedicalRecords(
+            [FromQuery] DateTime? medicalDate,
+            [FromQuery] string treatmentType)
+        {
+            // ตรวจสอบว่ามี Query Parameters หรือไม่
+            if (!medicalDate.HasValue && string.IsNullOrEmpty(treatmentType))
+            {
+                return BadRequest("Please provide at least one search parameter.");
+            }
+
+            // Query ข้อมูลจาก Database
+            var query = _context.MedicalRecords.AsQueryable();
+
+            // กรองตามวันที่การรักษา (ถ้ามี)
+            if (medicalDate.HasValue)
+                query = query.Where(m => m.Medical_Date.Date == medicalDate.Value.Date);
+
+            // กรองตามประเภทการรักษา (ถ้ามี)
+            if (!string.IsNullOrEmpty(treatmentType))
+                query = query.Where(m => m.TreatmentType.Contains(treatmentType));
+
+            var result = await query.ToListAsync();
+
+            // ตรวจสอบว่ามีข้อมูลหรือไม่
+            if (!result.Any())
+            {
+                return NotFound("No matching medical records found.");
+            }
+
+            // Return Response พร้อมข้อมูลที่ต้องการ
+            var response = result.Select(m => new
+            {
+                m.Record_ID,
+                m.Pet_ID,
+                m.TreatmentType,
+                m.TreatmentDetail,
+                m.Medical_Date,
+                m.Pet_Weight
+            });
+
+            return Ok(response);
         }
+
+
     }
 }

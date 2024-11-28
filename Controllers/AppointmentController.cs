@@ -97,5 +97,35 @@ namespace AnimalClinicAPI.Controllers
         {
             return _context.Appointments.Any(e => e.Appointment_ID == id);
         }
+        // GET: api/Appointment/search
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Appointment>>> SearchAppointments(
+            [FromQuery] DateTime? appointmentDate,
+            [FromQuery] string customerName)
+        {
+            // เริ่มต้น Query
+            var query = _context.Appointments.Include(a => a.PetOwner).AsQueryable();
+
+            // กรองตามวันที่นัดหมาย (ถ้ามี)
+            if (appointmentDate.HasValue)
+                query = query.Where(a => a.AppointmentDate.Date == appointmentDate.Value.Date);
+
+            // กรองตามชื่อลูกค้า (ถ้ามี)
+            if (!string.IsNullOrEmpty(customerName))
+                query = query.Where(a => a.PetOwner.Customer_firstname.Contains(customerName) || 
+                                        a.PetOwner.Customer_lastname.Contains(customerName));
+
+            // ดึงข้อมูลที่ตรงเงื่อนไข
+            var result = await query.ToListAsync();
+
+            // ตรวจสอบว่ามีข้อมูลหรือไม่
+            if (!result.Any())
+            {
+                return NotFound("No matching appointments found.");
+            }
+
+            return Ok(result);
+        }
+
     }
 }

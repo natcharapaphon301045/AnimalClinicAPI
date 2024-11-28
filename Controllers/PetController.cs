@@ -96,5 +96,50 @@ namespace AnimalClinicAPI.Controllers
         {
             return _context.Pets.Any(e => e.Pet_ID == id);
         }
+        // GET: api/Pet/search
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Pet>>> SearchPets(
+            [FromQuery] string petName,
+            [FromQuery] string ownerName,
+            [FromQuery] string pet_Breed)
+        {
+            
+            if (string.IsNullOrEmpty(petName) && string.IsNullOrEmpty(ownerName) && string.IsNullOrEmpty(pet_Breed))
+            {
+                return BadRequest("Please provide at least one search parameter.");
+            }
+            // ตั้งจุด Breakpoint
+            // Query ข้อมูลจาก Database
+            var query = _context.Pets.AsQueryable();
+
+            if (!string.IsNullOrEmpty(petName))
+                query = query.Where(p => p.Pet_Name.Contains(petName));
+
+            if (!string.IsNullOrEmpty(ownerName))
+                query = query.Where(p => p.PetOwner.Customer_firstname.Contains(ownerName) || p.PetOwner.Customer_lastname.Contains(ownerName));
+
+            if (!string.IsNullOrEmpty(pet_Breed))
+                query = query.Where(p => p.Pet_Breed.Contains(pet_Breed));
+
+            var result = await query.ToListAsync();
+
+            // ตรวจสอบว่ามีข้อมูลหรือไม่
+            if (!result.Any())
+            {
+                return NotFound("No matching pets found.");
+            }
+
+            // Return Response 5 ค่า
+            var response = result.Select(p => new
+            {
+                p.Pet_ID,
+                p.Pet_Name,
+                p.Pet_Breed,
+                OwnerName = p.PetOwner.Customer_firstname + " " + p.PetOwner.Customer_lastname,
+                p.Pet_Age
+            });
+
+            return Ok(response);
+        }
     }
 }

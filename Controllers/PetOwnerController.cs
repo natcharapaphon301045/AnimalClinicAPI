@@ -96,5 +96,52 @@ namespace AnimalClinicAPI.Controllers
         {
             return _context.PetOwners.Any(e => e.Customer_ID == id);
         }
+        
+        // GET: api/PetOwners/search
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<PetOwner>>> SearchPetOwners(
+            [FromQuery] string firstName,
+            [FromQuery] string lastName,
+            [FromQuery] string phoneNumber)
+        {
+            // ตรวจสอบว่ามีการส่งค่า Parameter อย่างน้อย 1 ตัว
+            if (string.IsNullOrEmpty(firstName) && string.IsNullOrEmpty(lastName) && string.IsNullOrEmpty(phoneNumber))
+            {
+                return BadRequest("Please provide at least one search parameter.");
+            }
+
+            // Query ข้อมูลจาก Database
+            var query = _context.PetOwners.AsQueryable();
+
+            if (!string.IsNullOrEmpty(firstName))
+                query = query.Where(po => po.Customer_firstname.Contains(firstName));
+
+            if (!string.IsNullOrEmpty(lastName))
+                query = query.Where(po => po.Customer_lastname.Contains(lastName));
+
+            if (!string.IsNullOrEmpty(phoneNumber))
+                query = query.Where(po => po.Phone_number.Contains(phoneNumber));
+
+            var result = await query.ToListAsync();
+
+            // ตรวจสอบว่ามีข้อมูลหรือไม่
+            if (!result.Any())
+            {
+                return NotFound("No matching pet owners found.");
+            }
+
+            // Return Response 5 ค่า
+            var response = result.Select(po => new
+            {
+                po.Customer_ID,
+                po.Customer_firstname,
+                po.Customer_lastname,
+                po.Phone_number,
+                TotalPets = _context.Pets.Count(p => p.Customer_ID == po.Customer_ID) // นับจำนวนสัตว์เลี้ยง
+            });
+
+            return Ok(response);
+        }
+
     }
 }

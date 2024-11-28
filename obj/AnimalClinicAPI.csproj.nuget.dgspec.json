@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ADMINS\\Desktop\\AnimalClinicAPI\\AnimalClinicAPI.csproj": {}
+    "c:\\Users\\ADMINS\\Desktop\\AnimalClinicAPI\\AnimalClinicAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ADMINS\\Desktop\\AnimalClinicAPI\\AnimalClinicAPI.csproj": {
+    "c:\\Users\\ADMINS\\Desktop\\AnimalClinicAPI\\AnimalClinicAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ADMINS\\Desktop\\AnimalClinicAPI\\AnimalClinicAPI.csproj",
+        "projectUniqueName": "c:\\Users\\ADMINS\\Desktop\\AnimalClinicAPI\\AnimalClinicAPI.csproj",
         "projectName": "AnimalClinicAPI",
-        "projectPath": "C:\\Users\\ADMINS\\Desktop\\AnimalClinicAPI\\AnimalClinicAPI.csproj",
+        "projectPath": "c:\\Users\\ADMINS\\Desktop\\AnimalClinicAPI\\AnimalClinicAPI.csproj",
         "packagesPath": "C:\\Users\\ADMINS\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ADMINS\\Desktop\\AnimalClinicAPI\\obj\\",
+        "outputPath": "c:\\Users\\ADMINS\\Desktop\\AnimalClinicAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ADMINS\\AppData\\Roaming\\NuGet\\NuGet.Config",
