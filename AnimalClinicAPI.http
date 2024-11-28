@@ -1,6 +1,37 @@
+# กำหนด Host Address ให้ใช้งานง่ายขึ้น
 @AnimalClinicAPI_HostAddress = http://localhost:5171
 
+# ตัวอย่าง GET Request
 GET {{AnimalClinicAPI_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+# ตัวอย่าง POST Request สำหรับ Appointment API
+POST {{AnimalClinicAPI_HostAddress}}/api/Appointment
+Content-Type: application/json
+
+{
+  "customerId": 7,
+  "petId": 6,
+  "statusAppointment": "Confirmed",
+  "appointmentDate": "2024-12-15",
+  "appointmentTime": "09:30:00"
+}
+
+###
+
+# ตัวอย่าง PUT Request สำหรับอัปเดต Appointment
+PUT {{AnimalClinicAPI_HostAddress}}/api/Appointment/7
+Content-Type: application/json
+
+{
+  "statusAppointment": "Cancelled",
+  "appointmentDate": "2024-12-16",
+  "appointmentTime": "10:30:00"
+}
+
+###
+
+# ตัวอย่าง DELETE Request
+DELETE {{AnimalClinicAPI_HostAddress}}/api/Appointment/7

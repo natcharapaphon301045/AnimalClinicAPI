@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add DbContext (Database connection)
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("VetweinaryClinic")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AnimalClinicDB")));
 
 // Add services to the container
 builder.Services.AddControllers();
