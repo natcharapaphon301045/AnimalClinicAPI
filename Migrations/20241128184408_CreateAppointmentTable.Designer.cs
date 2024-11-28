@@ -4,6 +4,7 @@ using AnimalClinicAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AnimalClinicAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241128184408_CreateAppointmentTable")]
+    partial class CreateAppointmentTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,6 +48,9 @@ namespace AnimalClinicAPI.Migrations
                     b.Property<int>("Pet_ID")
                         .HasColumnType("int");
 
+                    b.Property<int>("Pet_ID1")
+                        .HasColumnType("int");
+
                     b.Property<string>("StatusAppointment")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -54,7 +60,7 @@ namespace AnimalClinicAPI.Migrations
 
                     b.HasIndex("PetOwnerCustomer_ID");
 
-                    b.HasIndex("Pet_ID");
+                    b.HasIndex("Pet_ID1");
 
                     b.ToTable("Appointments");
                 });
@@ -76,6 +82,9 @@ namespace AnimalClinicAPI.Migrations
                     b.Property<int>("Pet_ID")
                         .HasColumnType("int");
 
+                    b.Property<int>("Pet_ID1")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("Pet_Weight")
                         .HasColumnType("decimal(18,2)");
 
@@ -91,7 +100,7 @@ namespace AnimalClinicAPI.Migrations
 
                     b.HasKey("Record_ID");
 
-                    b.HasIndex("Pet_ID");
+                    b.HasIndex("Pet_ID1");
 
                     b.ToTable("MedicalRecords");
                 });
@@ -177,8 +186,8 @@ namespace AnimalClinicAPI.Migrations
                         .IsRequired();
 
                     b.HasOne("AnimalClinicAPI.Models.Pet", "Pet")
-                        .WithMany("Appointments")
-                        .HasForeignKey("Pet_ID")
+                        .WithMany()
+                        .HasForeignKey("Pet_ID1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -190,8 +199,8 @@ namespace AnimalClinicAPI.Migrations
             modelBuilder.Entity("AnimalClinicAPI.Models.MedicalRecord", b =>
                 {
                     b.HasOne("AnimalClinicAPI.Models.Pet", "Pet")
-                        .WithMany("MedicalRecords")
-                        .HasForeignKey("Pet_ID")
+                        .WithMany()
+                        .HasForeignKey("Pet_ID1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -207,13 +216,6 @@ namespace AnimalClinicAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("PetOwner");
-                });
-
-            modelBuilder.Entity("AnimalClinicAPI.Models.Pet", b =>
-                {
-                    b.Navigation("Appointments");
-
-                    b.Navigation("MedicalRecords");
                 });
 #pragma warning restore 612, 618
         }
