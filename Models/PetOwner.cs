@@ -17,7 +17,8 @@ namespace AnimalClinicAPI.Models
 
         [MaxLength(50)]
         public string Customer_lastname {get; set;}/*null*/       
-        
-        
+    
+        // Navigation Property ที่เชื่อมโยงกับ Appointment
+        public ICollection<Appointment> Appointments { get; set; }  // Customer สามารถมีหลาย Appointment
     }
 }
