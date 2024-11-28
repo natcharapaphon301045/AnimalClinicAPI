@@ -15,111 +15,30 @@ namespace AnimalClinicAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Pet
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pet>>> GetPets()
-        {
-            return await _context.Pets.ToListAsync();
-        }
-
-        // GET: api/Pet/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Pet>> GetPet(int id)
-        {
-            var pet = await _context.Pets.FindAsync(id);
-
-            if (pet == null)
-            {
-                return NotFound();
-            }
-
-            return pet;
-        }
-
-        // POST: api/Pet
-        [HttpPost]
-        public async Task<ActionResult<Pet>> PostPet(Pet pet)
-        {
-            _context.Pets.Add(pet);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetPet", new { id = pet.Pet_ID }, pet);
-        }
-
-        // PUT: api/Pet/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPet(int id, Pet pet)
-        {
-            if (id != pet.Pet_ID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(pet).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PetExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // DELETE: api/Pet/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePet(int id)
-        {
-            var pet = await _context.Pets.FindAsync(id);
-            if (pet == null)
-            {
-                return NotFound();
-            }
-
-            _context.Pets.Remove(pet);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool PetExists(int id)
-        {
-            return _context.Pets.Any(e => e.Pet_ID == id);
-        }
         // GET: api/Pet/search
         [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<Pet>>> SearchPets(
+        public async Task<ActionResult<IEnumerable<object>>> SearchPets(
             [FromQuery] string petName,
-            [FromQuery] string ownerName,
-            [FromQuery] string pet_Breed)
+            [FromQuery] string breed,
+            [FromQuery] string ownerName)
         {
-            
-            if (string.IsNullOrEmpty(petName) && string.IsNullOrEmpty(ownerName) && string.IsNullOrEmpty(pet_Breed))
+            if (string.IsNullOrEmpty(petName) && string.IsNullOrEmpty(breed) && string.IsNullOrEmpty(ownerName))
             {
                 return BadRequest("Please provide at least one search parameter.");
             }
-            // ตั้งจุด Breakpoint
-            // Query ข้อมูลจาก Database
-            var query = _context.Pets.AsQueryable();
+
+            // Query ข้อมูลจากฐานข้อมูล
+            var query = _context.Pets.Include(p => p.PetOwner).AsQueryable();
 
             if (!string.IsNullOrEmpty(petName))
                 query = query.Where(p => p.Pet_Name.Contains(petName));
 
-            if (!string.IsNullOrEmpty(ownerName))
-                query = query.Where(p => p.PetOwner.Customer_firstname.Contains(ownerName) || p.PetOwner.Customer_lastname.Contains(ownerName));
+            if (!string.IsNullOrEmpty(breed))
+                query = query.Where(p => p.Pet_Breed.Contains(breed));
 
-            if (!string.IsNullOrEmpty(pet_Breed))
-                query = query.Where(p => p.Pet_Breed.Contains(pet_Breed));
+            if (!string.IsNullOrEmpty(ownerName))
+                query = query.Where(p => p.PetOwner.Customer_firstname.Contains(ownerName) || 
+                                         p.PetOwner.Customer_lastname.Contains(ownerName));
 
             var result = await query.ToListAsync();
 
@@ -129,17 +48,60 @@ namespace AnimalClinicAPI.Controllers
                 return NotFound("No matching pets found.");
             }
 
-            // Return Response 5 ค่า
+            // Response 5 ค่า
             var response = result.Select(p => new
             {
                 p.Pet_ID,
                 p.Pet_Name,
                 p.Pet_Breed,
-                OwnerName = p.PetOwner.Customer_firstname + " " + p.PetOwner.Customer_lastname,
-                p.Pet_Age
+                p.Pet_Age,
+                OwnerName = p.PetOwner.Customer_firstname + " " + p.PetOwner.Customer_lastname
             });
 
             return Ok(response);
+        }
+
+        // POST: api/Pet
+        [HttpPost]
+        public async Task<ActionResult<object>> PostPet(
+            [FromQuery] string petName,
+            [FromQuery] string breed,
+            [FromQuery] int age,
+            [FromQuery] int customerId)
+        {
+            // ตรวจสอบว่าพารามิเตอร์ครบถ้วน
+            if (string.IsNullOrEmpty(petName) || string.IsNullOrEmpty(breed) || age <= 0 || customerId <= 0)
+            {
+                return BadRequest("Please provide valid parameters: petName, breed, age, and customerId.");
+            }
+
+            // สร้างข้อมูลสัตว์เลี้ยงใหม่
+            var pet = new Pet
+            {
+                Pet_Name = petName,
+                Pet_Breed = breed,
+                Pet_Age = age,
+                Customer_ID = customerId
+            };
+
+            // บันทึกลงฐานข้อมูล
+            _context.Pets.Add(pet);
+            await _context.SaveChangesAsync();
+
+            // Response 5 ค่า
+            var response = new
+            {
+                pet.Pet_ID,
+                pet.Pet_Name,
+                pet.Pet_Breed,
+                pet.Pet_Age,
+                CustomerName = _context.PetOwners
+                                .Where(po => po.Customer_ID == customerId)
+                                .Select(po => po.Customer_firstname + " " + po.Customer_lastname)
+                                .FirstOrDefault()
+            };
+
+            return CreatedAtAction(nameof(SearchPets), new { pet.Pet_ID }, response);
         }
     }
 }

@@ -15,91 +15,47 @@ namespace AnimalClinicAPI.Controllers
             _context = context;
         }
 
-        // GET: api/PetOwners
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<PetOwner>>> GetPetOwners()
+        [HttpPost]
+        public async Task<ActionResult<object>> PostPetOwner(
+            [FromQuery] string firstName,
+            [FromQuery] string lastName,
+            [FromQuery] string phoneNumber)
         {
-            return await _context.PetOwners.ToListAsync();
-        }
-
-        // GET: api/PetOwners/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<PetOwner>> GetPetOwner(int id)
-        {
-            var petOwner = await _context.PetOwners.FindAsync(id);
-
-            if (petOwner == null)
+            // ตรวจสอบว่าพารามิเตอร์ครบหรือไม่
+            if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName) || string.IsNullOrEmpty(phoneNumber))
             {
-                return NotFound();
+                return BadRequest("Please provide all required parameters: firstName, lastName, and phoneNumber.");
             }
 
-            return petOwner;
-        }
+            // สร้าง PetOwner ใหม่
+            var petOwner = new PetOwner
+            {
+                Customer_firstname = firstName,
+                Customer_lastname = lastName,
+                Phone_number = phoneNumber
+            };
 
-        // POST: api/PetOwners
-        [HttpPost]
-        public async Task<ActionResult<PetOwner>> PostPetOwner(PetOwner petOwner)
-        {
+            // บันทึกลง Database
             _context.PetOwners.Add(petOwner);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetPetOwner), new { id = petOwner.Customer_ID }, petOwner);
+            // Response 5 ค่า
+            var response = new
+            {
+                petOwner.Customer_ID,           // รหัสลูกค้า
+                petOwner.Customer_firstname,    // ชื่อ
+                petOwner.Customer_lastname,     // นามสกุล
+                petOwner.Phone_number,          // เบอร์โทร
+                TotalPets = _context.Pets.Count(p => p.Customer_ID == petOwner.Customer_ID) // จำนวนสัตว์เลี้ยงของเจ้าของคนนี้
+            };
+
+            return Ok(response);
         }
 
-        // PUT: api/PetOwners/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPetOwner(int id, PetOwner petOwner)
-        {
-            if (id != petOwner.Customer_ID)
-            {
-                return BadRequest();
-            }
 
-            _context.Entry(petOwner).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PetOwnerExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // DELETE: api/PetOwners/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePetOwner(int id)
-        {
-            var petOwner = await _context.PetOwners.FindAsync(id);
-            if (petOwner == null)
-            {
-                return NotFound();
-            }
-
-            _context.PetOwners.Remove(petOwner);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool PetOwnerExists(int id)
-        {
-            return _context.PetOwners.Any(e => e.Customer_ID == id);
-        }
-        
         // GET: api/PetOwners/search
         [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<PetOwner>>> SearchPetOwners(
+        public async Task<ActionResult<IEnumerable<object>>> SearchPetOwners(
             [FromQuery] string firstName,
             [FromQuery] string lastName,
             [FromQuery] string phoneNumber)
@@ -142,6 +98,5 @@ namespace AnimalClinicAPI.Controllers
 
             return Ok(response);
         }
-
     }
 }
