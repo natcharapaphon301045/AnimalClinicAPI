@@ -27,7 +27,7 @@ namespace AnimalClinicAPI.Controllers
                 return BadRequest("Please provide at least one search parameter.");
             }
 
-            var query = _context.Appointments
+            var query = _context.Appointment
                 .Include(a => a.PetOwner)
                 .Include(a => a.Pet)
                 .AsQueryable();
@@ -53,7 +53,7 @@ namespace AnimalClinicAPI.Controllers
                 a.Appointment_ID,
                 a.Pet_ID,
                 PetName = a.Pet.Pet_Name,
-                CustomerName = a.PetOwner.Customer_firstname + " " + a.PetOwner.Customer_lastname,
+                CustomerName = a.PetOwner.Customer_Firstname + " " + a.PetOwner.Customer_Lastname,
                 a.AppointmentDate,
                 a.AppointmentTime,
                 a.StatusAppointment
@@ -85,7 +85,7 @@ namespace AnimalClinicAPI.Controllers
                 StatusAppointment = statusAppointment
             };
 
-            _context.Appointments.Add(appointment);
+            _context.Appointment.Add(appointment);
             await _context.SaveChangesAsync();
 
             var response = new
