@@ -8,6 +8,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AnimalClinicDB")));
 
+// Add CORS policy to allow all origins (for testing purposes)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin() // อนุญาตให้เข้าถึงจากทุกโดเมน
+               .AllowAnyMethod() // อนุญาตทุก HTTP method (GET, POST, etc.)
+               .AllowAnyHeader(); // อนุญาตทุก header
+    });
+});
+
 // Add services to the container
 builder.Services.AddControllers();
 
@@ -23,6 +34,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger(); // เปิด Swagger (API documentation)
     app.UseSwaggerUI(); // เปิด Swagger UI (Interface for testing API)
 }
+
+// Enable CORS to allow cross-origin requests
+app.UseCors("AllowAll"); // ใช้งาน CORS policy
 
 app.UseHttpsRedirection();
 
