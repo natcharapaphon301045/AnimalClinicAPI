@@ -1,6 +1,6 @@
 using Dapper; // ใช้สำหรับ Query ข้อมูลแบบง่าย
 using Microsoft.Data.SqlClient; // ใช้ SqlConnection สำหรับเชื่อมต่อฐานข้อมูล
-using YourProject.Models; // อ้างอิง Model `MedicalRecord`
+using AnimalClinicAPI.Models;
 
 namespace YourProject.Services
 {
