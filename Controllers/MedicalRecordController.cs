@@ -29,7 +29,7 @@ namespace AnimalClinicAPI.Controllers
             }
 
             // Query ข้อมูลจากฐานข้อมูล
-            var query = _context.MedicalRecords.AsQueryable();
+            var query = _context.MedicalRecord.AsQueryable();
 
             if (petId.HasValue)
                 query = query.Where(m => m.Pet_ID == petId.Value);
@@ -86,7 +86,7 @@ namespace AnimalClinicAPI.Controllers
                 Pet_Weight = petWeight
             };
 
-            _context.MedicalRecords.Add(medicalRecord);
+            _context.MedicalRecord.Add(medicalRecord);
             await _context.SaveChangesAsync();
 
             // Response 5 ค่า

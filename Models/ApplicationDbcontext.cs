@@ -1,22 +1,33 @@
 using Microsoft.EntityFrameworkCore;
+using AnimalClinicAPI.Models;
 
 namespace AnimalClinicAPI.Models
 {
     public class ApplicationDbContext : DbContext
     {
-        // Constructor นี้ไม่จำเป็นต้องใช้ IConfiguration
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+            public DbSet<PetOwner> PetOwner { get; set; }
+            public DbSet<Pet> Pet { get; set; }
+            public DbSet<MedicalRecord> MedicalRecord { get; set; }
+            public DbSet<Appointment> Appointment { get; set; }
+       
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
+            
         }
-
-        public DbSet<Pet> Pets { get; set; }
-        public DbSet<PetOwner> PetOwners { get; set; }
-        public DbSet<MedicalRecord> MedicalRecords { get; set; }
-        public DbSet<Appointment> Appointments { get; set; }
-
         // การกำหนดความสัมพันธ์ (OnModelCreating) ตามปกติ
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<PetOwner>().ToTable("PetOwners");
+            modelBuilder.Entity<Pet>().ToTable("Pets");
+            modelBuilder.Entity<MedicalRecord>().ToTable("MedicalRecords");
+            modelBuilder.Entity<Appointment>().ToTable("Appointments");
+
+            modelBuilder.Entity<Pet>()
+                .HasOne(p => p.PetOwner)  // Pet มี PetOwner
+                .WithMany(po => po.Pets)  // PetOwner มีหลาย Pet
+                .HasForeignKey(p => p.Customer_ID)  // FK ที่เชื่อมโยงจาก Pet ไปยัง PetOwner
+                .OnDelete(DeleteBehavior.Restrict); 
+
             modelBuilder.Entity<Appointment>()
                 .HasOne(a => a.Pet)
                 .WithMany(p => p.Appointments)

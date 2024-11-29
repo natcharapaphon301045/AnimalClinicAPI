@@ -17,41 +17,33 @@ namespace AnimalClinicAPI.Controllers
 
         [HttpPost]
         public async Task<ActionResult<object>> PostPetOwner(
-            [FromQuery] string firstName,
-            [FromQuery] string lastName,
-            [FromQuery] string phoneNumber)
+            [FromBody] PetOwner petOwner)
         {
-            // ตรวจสอบว่าพารามิเตอร์ครบหรือไม่
-            if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName) || string.IsNullOrEmpty(phoneNumber))
+            // ตรวจสอบว่าได้รับข้อมูลหรือไม่
+            if (petOwner == null || 
+                string.IsNullOrEmpty(petOwner.Customer_Firstname) ||
+                string.IsNullOrEmpty(petOwner.Customer_Lastname) ||
+                string.IsNullOrEmpty(petOwner.Phonenumber))
             {
-                return BadRequest("Please provide all required parameters: firstName, lastName, and phoneNumber.");
+                return BadRequest("Please provide all required fields: firstName, lastName, and phoneNumber.");
             }
 
-            // สร้าง PetOwner ใหม่
-            var petOwner = new PetOwner
-            {
-                Customer_firstname = firstName,
-                Customer_lastname = lastName,
-                Phone_number = phoneNumber
-            };
-
-            // บันทึกลง Database
-            _context.PetOwners.Add(petOwner);
+            // บันทึกข้อมูล PetOwner ลงใน Database
+            _context.PetOwner.Add(petOwner);
             await _context.SaveChangesAsync();
 
-            // Response 5 ค่า
+            // สร้าง Response ที่มี 5 ค่า
             var response = new
             {
                 petOwner.Customer_ID,           // รหัสลูกค้า
-                petOwner.Customer_firstname,    // ชื่อ
-                petOwner.Customer_lastname,     // นามสกุล
-                petOwner.Phone_number,          // เบอร์โทร
-                TotalPets = _context.Pets.Count(p => p.Customer_ID == petOwner.Customer_ID) // จำนวนสัตว์เลี้ยงของเจ้าของคนนี้
+                petOwner.Customer_Firstname,    // ชื่อ
+                petOwner.Customer_Lastname,     // นามสกุล
+                petOwner.Phonenumber,          // เบอร์โทร
+                TotalPets = _context.Pet.Count(p => p.Customer_ID == petOwner.Customer_ID) // จำนวนสัตว์เลี้ยงของเจ้าของคนนี้
             };
 
             return Ok(response);
         }
-
 
         // GET: api/PetOwners/search
         [HttpGet("search")]
@@ -67,16 +59,16 @@ namespace AnimalClinicAPI.Controllers
             }
 
             // Query ข้อมูลจาก Database
-            var query = _context.PetOwners.AsQueryable();
+            var query = _context.PetOwner.AsQueryable();
 
             if (!string.IsNullOrEmpty(firstName))
-                query = query.Where(po => po.Customer_firstname.Contains(firstName));
+                query = query.Where(po => po.Customer_Firstname.Contains(firstName));
 
             if (!string.IsNullOrEmpty(lastName))
-                query = query.Where(po => po.Customer_lastname.Contains(lastName));
+                query = query.Where(po => po.Customer_Lastname.Contains(lastName));
 
             if (!string.IsNullOrEmpty(phoneNumber))
-                query = query.Where(po => po.Phone_number.Contains(phoneNumber));
+                query = query.Where(po => po.Phonenumber.Contains(phoneNumber));
 
             var result = await query.ToListAsync();
 
@@ -90,10 +82,10 @@ namespace AnimalClinicAPI.Controllers
             var response = result.Select(po => new
             {
                 po.Customer_ID,
-                po.Customer_firstname,
-                po.Customer_lastname,
-                po.Phone_number,
-                TotalPets = _context.Pets.Count(p => p.Customer_ID == po.Customer_ID) // นับจำนวนสัตว์เลี้ยง
+                po.Customer_Firstname,
+                po.Customer_Lastname,
+                po.Phonenumber,
+                TotalPets = _context.Pet.Count(p => p.Customer_ID == po.Customer_ID) // นับจำนวนสัตว์เลี้ยง
             });
 
             return Ok(response);
